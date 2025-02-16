@@ -1,0 +1,14 @@
+# Ignore Node.js dependencies
+eye-test-app/node_modules/
+eye-test-app/.next/
+eye-test-app/.parcel-cache/
+
+# Ignore Python virtual environment
+backend/venv/
+backend/__pycache__/
+backend/.env
+
+# Ignore system files
+.DS_Store
+check.html
+test.js 

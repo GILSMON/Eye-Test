@@ -9,6 +9,8 @@ from io import BytesIO
 from PIL import Image
 from channels.generic.websocket import AsyncWebsocketConsumer
 from eye_tracking.processor import process_frame # Import the function from the processor.py file
+from eye_tracking.gemini_response import get_gemini_response 
+
 
 class MyConsumer(AsyncWebsocketConsumer):
     
@@ -56,17 +58,25 @@ class MyConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         print("WebSocket Disconnected")
 
-# class TextConsumer(AsyncWebsocketConsumer):
-#     """Handles text processing with Gemini API."""
+class TextConsumer(AsyncWebsocketConsumer):
+    """Handles text processing with Gemini API."""
     
-#     async def receive(self, text_data=None):
-#         request_data = json.loads(text_data)
-#         if request_data.get("type") == "text_query":
-#             user_input = request_data.get("query", "")
-#             response = await self.get_gemini_response(user_input)
+    async def receive(self, text_data=None):
+        request_data = json.loads(text_data)
+        
+        if request_data.get("type") == "text_query":
+            user_input = request_data.get("query", "")
+            print(f"Received request data: {request_data}")  # Debug log
 
-#             await self.send(text_data=json.dumps({
-#                 "type": "text_response",
-#                 "response": response
-#             }))
+            response = await get_gemini_response(user_input)  # Now calling the function from gemini_response.py
+           
+            print(f"Sending response: {response}")  # Debug log
+
+            await self.send(text_data=json.dumps({
+                "type": "text_response",
+                "response": response
+            }))
+
+    async def disconnect(self, close_code):
+        print("WebSocket Disconnected")
     

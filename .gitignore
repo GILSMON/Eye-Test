@@ -13,3 +13,4 @@ backend/.env
 check.html
 test.js 
 consumers old.py
+backend/.env

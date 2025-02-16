@@ -4,7 +4,7 @@ import Home from "./pages/Home/Home";
 import Login from "./components/Login/Login";
 import Signup from "./pages/Signup/Signup";
 import Userpage from "./pages/Userpage/Userpage";
-import Userexercise from "./pages/Userpage/Userexercise";
+import Userexercise from "./pages/Userpage/Usertest";
 import { ToastContainer } from "react-toastify";
 import { CssBaseline } from "@mui/material";
 
@@ -23,6 +23,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/user" element={<Userpage />} />
         <Route path="/exercise" element={<Userexercise />} />
+      
       </Routes>
     </Router>
     </div>

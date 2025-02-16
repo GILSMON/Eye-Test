@@ -3,6 +3,8 @@ import { Container, Typography, Button, AppBar, Toolbar, Box } from "@mui/materi
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../../firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
+import WebcamCapture from "../../components/WebcamCapture/WebcamCapture";
+import DataCapture from "../../components/WebcamCapture/DataCapture";
 import WebcamFeed from "../../components/WebcamCapture/WebcamFeed"; // Import the updated WebcamFeed
 
 

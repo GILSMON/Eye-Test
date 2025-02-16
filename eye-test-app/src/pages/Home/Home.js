@@ -16,12 +16,13 @@ const Home = () => {
   const handleStartTest = () => {
     
     console.log("Eye Test Started"); // Replace with navigation logic
-    navigate("/user"); 
+    navigate("/exercise");
   };
 
   const handleStartExercise = () => {
     console.log("Exercise Started");
-    navigate("/exercise");
+    navigate("/user"); 
+    
   };
   return (
     <div>

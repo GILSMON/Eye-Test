@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Box, TextField, Typography, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import LandoltTest from "../../components/LandoltTest/LandoltTest";
 
 const Userexercise = () => {
   const [text, setText] = useState("");
   const [socket, setSocket] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const ws = new WebSocket("ws://localhost:8000/ws/stream/text/");
@@ -36,7 +39,7 @@ const Userexercise = () => {
     if (socket && socket.readyState === WebSocket.OPEN) {
         const message = JSON.stringify({
             type: "text_query",
-            query: text,
+            query: "hi",
           });
         socket.send(message);
         console.log("Sent to backend:", text);
@@ -54,21 +57,26 @@ const Userexercise = () => {
         alignItems: "center",
       }}
     >
-      <Typography variant="h4" sx={{ mb: 2 }}>
-        Eye Exercise
-      </Typography>
-      <TextField
-        label="Enter something..."
-        variant="outlined"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        sx={{ mb: 2 }}
-      />
-      <Button variant="contained" onClick={handleSend}>
-        Send
+      <Button
+        variant="contained"
+        sx={{ position: "absolute", top: 20, left: 20 }}
+        onClick={() => navigate("/")}
+      >
+        Back to Home
       </Button>
+
+      <Typography variant="h4" sx={{ mb: 2 }}>
+        Eye Test
+      </Typography>
+      <Button variant="contained" onClick={handleSend}>
+          Get Report
+          </Button>
+        <LandoltTest />
+
+     
     </Box>
   );
 };
 
 export default Userexercise;
+

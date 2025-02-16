@@ -1,11 +1,12 @@
 import React from "react";
 import Navbar from "../../components/Navbar/Navbar";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; 
 //import homePageImage from "../../assets/images/home_page_image.jpg"
 import homePageImage from "../../assets/images/woman-eye.jpg"
 
 import { Box ,Typography} from "@mui/material";
 import EyeTestCard from "../../components/EyeTestCard/EyeTestCard";
+
 
 
 
@@ -16,6 +17,11 @@ const Home = () => {
     
     console.log("Eye Test Started"); // Replace with navigation logic
     navigate("/user"); 
+  };
+
+  const handleStartExercise = () => {
+    console.log("Exercise Started");
+    navigate("/exercise");
   };
   return (
     <div>
@@ -74,8 +80,9 @@ const Home = () => {
           Take a quick test now and give your vision the care it deserves.
         </Typography>
 
-        {/* Eye Test Card (Only Button Inside) */}
-        <EyeTestCard onStartTest={handleStartTest} />
+        {/* Updated EyeTestCard with both button handlers */}
+        <EyeTestCard onStartTest={handleStartTest} onStartExercise={handleStartExercise} />
+      
       </Box>
     </div>
   );

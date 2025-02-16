@@ -11,6 +11,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from eye_tracking.processor import process_frame # Import the function from the processor.py file
 
 class MyConsumer(AsyncWebsocketConsumer):
+    
     async def connect(self):
         await self.accept()
         print("WebSocket Connected")
@@ -27,6 +28,7 @@ class MyConsumer(AsyncWebsocketConsumer):
                 # Convert PIL image to OpenCV format
                 open_cv_image = np.array(image)
                 open_cv_image = cv2.cvtColor(open_cv_image, cv2.COLOR_RGB2BGR)
+                open_cv_image = cv2.flip(open_cv_image, 1)  # Flip image
 
                 # Process frame with MediaPipe
                 status, processed_image = process_frame(open_cv_image)
@@ -53,4 +55,18 @@ class MyConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         print("WebSocket Disconnected")
+
+# class TextConsumer(AsyncWebsocketConsumer):
+#     """Handles text processing with Gemini API."""
+    
+#     async def receive(self, text_data=None):
+#         request_data = json.loads(text_data)
+#         if request_data.get("type") == "text_query":
+#             user_input = request_data.get("query", "")
+#             response = await self.get_gemini_response(user_input)
+
+#             await self.send(text_data=json.dumps({
+#                 "type": "text_response",
+#                 "response": response
+#             }))
     

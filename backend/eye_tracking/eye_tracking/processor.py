@@ -13,7 +13,9 @@ def process_frame(image):
     # Process hand landmarks
     hand_results = mp_hands.process(img_rgb)
 
-    if not results.multi_face_landmarks:
+    if not results.multi_face_landmarks and hand_results.multi_hand_landmarks:
+        return "Hand cover both eyes", image
+    elif not results.multi_face_landmarks:
         return "No face detected", image
 
     for face_landmarks in results.multi_face_landmarks:

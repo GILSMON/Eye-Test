@@ -98,7 +98,7 @@ export default function WebcamFeed() {
                 onClick={() => setIsStreaming(true)}
                 disabled={isStreaming}
             >
-                Start 
+                Start Test
             </Button>
             <Button
                 variant="contained"
@@ -106,7 +106,7 @@ export default function WebcamFeed() {
                 onClick={() => setIsStreaming(false)}
                 disabled={!isStreaming}
             >
-                Stop
+                Stop Test
             </Button>
         </Box>
         <Box

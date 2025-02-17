@@ -16,7 +16,7 @@ const Home = () => {
   const handleStartTest = () => {
     
     console.log("Eye Test Started"); // Replace with navigation logic
-    navigate("/exercise");
+    navigate("/eyetest");
   };
 
   const handleStartExercise = () => {

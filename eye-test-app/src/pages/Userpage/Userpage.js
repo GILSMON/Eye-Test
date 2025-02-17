@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Container, Typography, Button, AppBar, Toolbar, Box } from "@mui/material";
+import { Container, Typography, Button, AppBar, Toolbar, Box,Paper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../../firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import WebcamFeed from "../../components/WebcamCapture/WebcamFeed"; // Import the updated WebcamFeed
+import Userexercise from "./Userexercise"
 
 
 
@@ -60,7 +61,7 @@ const UserPage = () => {
       <AppBar position="static" sx={{ backgroundColor: "#0D1B2A", padding: 1 }}>
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <Typography variant="h6" sx={{ color: "#E0E1DD", fontWeight: "bold" }}>
-            Welcome, {userName}!
+            Welcome {userName}
           </Typography>
           <Typography variant="h6" sx={{ color: "#E0E1DD" }}>
             Score: {score}
@@ -75,6 +76,7 @@ const UserPage = () => {
         </Button>
         </Toolbar>
       </AppBar>
+    
 
       {/* Main Content */}
       <Container
@@ -91,6 +93,7 @@ const UserPage = () => {
         {/* <WebcamCapture />
         <DataCapture /> */}
         <WebcamFeed/>
+        
      
       </Container>
     </Box>

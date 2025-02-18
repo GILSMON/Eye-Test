@@ -25,6 +25,10 @@ export default function WebcamFeed() {
                 console.log("Received status:", data.status);  // Debugging log
                 eventBus.emit("response", data.status);
             }
+            if (data.blinks) {
+                console.log("Received status:", data.blinks);  // Debugging log
+                eventBus.emit("blinks", data.blinks);
+            }
         };
         setWs(socket);
         return () => socket.close();
@@ -76,28 +80,74 @@ export default function WebcamFeed() {
         return () => clearInterval(interval);
     }, [isStreaming]);
 
-    return (
-        <Box sx={{ bgcolor: "#121212", color: "white", position: "relative", height: "100vh" }}>
-            <Box sx={{ position: "absolute", top: 20, right: 20, display: "flex", gap: 2, zIndex: 10 }}>
-                <Button variant="contained" color="success" onClick={() => setIsStreaming(true)} disabled={isStreaming}>
-                    Start Test
-                </Button>
-                <Button variant="contained" color="error" onClick={() => setIsStreaming(false)} disabled={!isStreaming}>
-                    Stop Test
-                </Button>
-            </Box>
-             {/* Response Text Box */} 
-       
-            <Box sx={{ position: "fixed", bottom: 200, right: 20, width: 200, height: 150, borderRadius: 2, overflow: "hidden", boxShadow: 3, border: "2px solid white", backgroundColor: "black" }}>
-                {processedFrame && <img src={processedFrame} alt="Processed Video Frame" width="100%" height="100%" />}
-            </Box>
-            <Box sx={{ position: "fixed", bottom: 20, right: 20, width: 200, height: 150, borderRadius: 2, overflow: "hidden", boxShadow: 3, border: "2px solid white", backgroundColor: "black" }}>
-                <video ref={videoRef} autoPlay playsInline width="100%" height="100%" />
-            </Box>
-            <Typography variant="h6" sx={{ position: "absolute", bottom: 80, right: 20, color: "white" }}>
-                Status: {response}
-            </Typography>
-            <canvas ref={canvasRef} width={400} height={300} style={{ display: "none" }} />
+  return (
+    <Box sx={{ bgcolor: "#121212", color: "white", position: "relative", height: "100vh" }}>
+        
+        {/* Move Buttons Above Both Video Feeds */}
+        <Box 
+    sx={{
+        position: "fixed",
+        bottom: 380, // Adjust based on your layout
+        right: 20,
+        width: 173, // Match this with the camera feed box width
+        backgroundColor: "#1E1E1E",
+        borderRadius: 2,
+        padding: 2,
+        textAlign: "center",
+        boxShadow: 3,
+        border: "2px solid white",
+    }}
+>
+    {/* Tracking Header */}
+    <Typography 
+        variant="h6" 
+        sx={{ 
+            color: "white", 
+            fontWeight: "bold", 
+            mb: 1 
+        }}
+    >
+        Tracking
+    </Typography>
+
+    {/* Tracking Controls */}
+    <Box sx={{ display: "flex", justifyContent: "space-evenly", alignItems: "center" }}>
+        <Button 
+            variant="contained" 
+            color="success" 
+            onClick={() => setIsStreaming(true)} 
+            disabled={isStreaming}
+            sx={{ width: "40%" }}  // Adjust width for equal spacing
+        >
+            ▶️
+        </Button>
+        <Button 
+            variant="contained" 
+            color="error" 
+            onClick={() => setIsStreaming(false)} 
+            disabled={!isStreaming}
+            sx={{ width: "40%" }}  // Adjust width for equal spacing
+        >
+            ⏸️
+        </Button>
+    </Box>
+</Box>
+        {/* Processed Video Frame */}
+        <Box sx={{ position: "fixed", bottom: 200, right: 20, width: 200, height: 150, borderRadius: 2, overflow: "hidden", boxShadow: 3, border: "2px solid white", backgroundColor: "black" }}>
+            {processedFrame && <img src={processedFrame} alt="Processed Video Frame" width="100%" height="100%" />}
         </Box>
-    );
+
+        {/* Live Webcam Feed */}
+        <Box sx={{ position: "fixed", bottom: 20, right: 20, width: 200, height: 150, borderRadius: 2, overflow: "hidden", boxShadow: 3, border: "2px solid white", backgroundColor: "black" }}>
+            <video ref={videoRef} autoPlay playsInline width="100%" height="100%" />
+        </Box>  
+
+        {/* Status Display */}
+        <Typography variant="h6" sx={{ position: "absolute", bottom: 80, right: 20, color: "white" }}>
+            Status: {response}
+        </Typography>
+
+        <canvas ref={canvasRef} width={400} height={300} style={{ display: "none" }} />
+    </Box>
+);
 }

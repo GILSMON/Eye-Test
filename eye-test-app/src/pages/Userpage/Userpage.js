@@ -21,13 +21,13 @@ import { eventBus } from "../../utils/eventBus";
 
 const UserPage = () => {
   const [userName, setUserName] = useState("");
-  const [score, setScore] = useState(0);
   const [response, setResponse] = useState("");
   const [tabValue, setTabValue] = useState(0);
-  const [exerciseStep, setExerciseStep] = useState(0); // Track exercise step
-  const [timer, setTimer] = useState(0); // Timer for exercises
-  const [isExerciseActive, setIsExerciseActive] = useState(false); // Track if exercise is active
-  const [warning, setWarning] = useState(""); // Warnings for user
+  const [timer, setTimer] = useState(60);
+  const [isExerciseActive, setIsExerciseActive] = useState(false);
+  const [isTimerPaused, setIsTimerPaused] = useState(false);
+  const [exerciseCompleted, setExerciseCompleted] = useState(false);
+  const [warning, setWarning] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,17 +39,12 @@ const UserPage = () => {
           const userDoc = await getDoc(userDocRef);
           if (userDoc.exists()) {
             setUserName(userDoc.data().firstName || "User");
-          } else {
-            console.log("User document not found in Firestore");
           }
         } catch (error) {
           console.error("Error fetching user data:", error);
         }
-      } else {
-        console.log("No authenticated user found");
       }
     };
-
     fetchUserName();
   }, []);
 
@@ -58,66 +53,43 @@ const UserPage = () => {
       console.log("Response value:", newResponse);
       setResponse(newResponse);
 
-      // Check for warnings during exercise
       if (isExerciseActive) {
-        if (exerciseStep === 0 && newResponse !== "Both Eyes Closed") {
-          setWarning("Please keep both eyes closed!");
-        } else if (exerciseStep === 1 && newResponse !== "Eyes Open") {
-          setWarning("Please keep your eyes open and blink rapidly!");
+        if (newResponse === "Hand cover both eyes") {
+          setWarning("");
+          if (isTimerPaused) {
+            setIsTimerPaused(false);
+          }
+        } else {
+          setWarning("Please keep your hands over your eyes (Palming)");
+          setIsTimerPaused(true);
         }
       }
     };
 
     eventBus.on("response", handleResponseUpdate);
-
     return () => {
       eventBus.off("response", handleResponseUpdate);
     };
-  }, [isExerciseActive, exerciseStep]);
+  }, [isExerciseActive, isTimerPaused]);
 
   useEffect(() => {
     let interval;
-    if (isExerciseActive && timer > 0) {
+    if (isExerciseActive && !isTimerPaused && timer > 0) {
       interval = setInterval(() => {
         setTimer((prev) => prev - 1);
       }, 1000);
-    } else if (timer === 0 && isExerciseActive) {
+    } else if (timer === 0) {
       setIsExerciseActive(false);
-      setWarning("");
-      if (exerciseStep === 0) {
-        setExerciseStep(1); // Move to next exercise
-      } else {
-        setExerciseStep(0); // Reset to first exercise
-      }
+      setExerciseCompleted(true);
     }
-
     return () => clearInterval(interval);
-  }, [isExerciseActive, timer, exerciseStep]);
-
-  const handleLogout = async () => {
-    try {
-      await auth.signOut();
-      navigate("/");
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
-  };
-
-  const handleTest = async () => {
-    try {
-      navigate("/eyetest");
-    } catch (error) {
-      console.error("Error in moving to test page", error);
-    }
-  };
-
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
-  };
+  }, [isExerciseActive, isTimerPaused, timer]);
 
   const startExercise = () => {
     setIsExerciseActive(true);
-    setTimer(60); // Set timer for 1 minute
+    setTimer(60);
+    setIsTimerPaused(false);
+    setExerciseCompleted(false);
     setWarning("");
   };
 
@@ -131,27 +103,23 @@ const UserPage = () => {
         backgroundColor: "#F5F5F5",
       }}
     >
-      {/* Top Score Bar */}
       <AppBar position="static" sx={{ backgroundColor: "#0D1B2A", padding: 1 }}>
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <Typography variant="h6" sx={{ color: "#E0E1DD", fontWeight: "bold" }}>
             Welcome {userName}
           </Typography>
-          <Typography variant="h6" sx={{ color: "#E0E1DD" }}>
-            <Button variant="contained" onClick={handleTest} sx={{ mt: 3 }}>
-              Take an Eye Test
-            </Button>
-          </Typography>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleLogout}
-            sx={{ mt: 3 }}
-          >
+          <Button variant="contained" onClick={() => navigate("/eyetest")} sx={{ mt: 3 }}>
+            Take an Eye Test
+          </Button>
+          <Button variant="contained" color="secondary" onClick={() => 
+          
+          navigate("/")} 
+            
+            sx={{ mt: 3 }}>
             Logout
           </Button>
-          {/* Response Text Box */}
-          <Box
+           {/* Response Text Box */}
+           <Box
             sx={{
               position: "absolute",
               top: 80,
@@ -169,97 +137,80 @@ const UserPage = () => {
           </Box>
         </Toolbar>
       </AppBar>
+      
 
-      {/* Tabs for Palming and Blinking */}
       <Box sx={{ width: "100%", mt: 2 }}>
-        <Tabs
-          value={tabValue}
-          onChange={handleTabChange}
-          centered
-          sx={{ backgroundColor: "#FFFFFF" }}
-        >
+        <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)} centered>
           <Tab label="Palming" />
           <Tab label="Blinking" />
         </Tabs>
       </Box>
 
-      {/* Main Content */}
-      <Container
-        maxWidth="sm"
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          flexGrow: 1,
-          mt: 4,
-        }}
-      >
-        {/* Display instructions based on the selected tab */}
+      <Container maxWidth="sm" sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 4 }}>
         {tabValue === 0 && (
-          <Paper
-            elevation={3}
-            sx={{ padding: 3, width: "100%", textAlign: "center", mb: 2 }}
-          >
+          <Paper elevation={3} sx={{ padding: 3, width: "100%", textAlign: "center", mb: 2 }}>
             <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
               Palming Instructions
             </Typography>
             <Typography variant="body1">
-              Place your palms gently over your eyes, ensuring no pressure is
-              applied. Keep your eyes closed and relax for 1-2 minutes. This
-              helps reduce eye strain and improve blood circulation.
+              Place your palms gently over your eyes, ensuring no pressure is applied. Keep your eyes closed and relax for 1 minute.
             </Typography>
           </Paper>
         )}
 
         {tabValue === 1 && (
-          <Paper
-            elevation={3}
-            sx={{ padding: 3, width: "100%", textAlign: "center", mb: 2 }}
-          >
+          <Paper elevation={3} sx={{ padding: 3, width: "100%", textAlign: "center", mb: 2 }}>
             <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
               Blinking Instructions
             </Typography>
             <Typography variant="body1">
-              Blink your eyes rapidly for 10-15 seconds, then close them and
-              relax for 10 seconds. Repeat this process 5-10 times. Blinking
-              helps keep your eyes moist and reduces dryness.
+              Blink rapidly for 10-15 seconds, then close your eyes and relax for 10 seconds. Repeat this process 5-10 times.
             </Typography>
           </Paper>
         )}
 
-        {/* Exercise Section */}
-        {tabValue === 1 && (
-          <Box sx={{ mt: 4, textAlign: "center" }}>
+        {tabValue === 0 && (
+          <Box sx={{ mt: 4, textAlign: "center", width: "100%" }}>
             <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
-              Blinking Exercise
+              Palming Exercise
             </Typography>
-            {!isExerciseActive ? (
+
+            {!isExerciseActive && !exerciseCompleted && (
               <Button variant="contained" onClick={startExercise}>
                 Start Exercise
               </Button>
-            ) : (
+            )}
+
+            {isExerciseActive && (
               <>
                 <Typography variant="body1" sx={{ mb: 2 }}>
-                  {exerciseStep === 0
-                    ? "Close both eyes for 1 minute."
-                    : "Blink rapidly for 10 seconds."}
+                  Cover both eyes gently with your hands.
                 </Typography>
                 <CircularProgress />
                 <Typography variant="h6" sx={{ mt: 2 }}>
                   Time Remaining: {timer} seconds
                 </Typography>
-                {warning && (
-                  <Alert severity="error" sx={{ mt: 2 }}>
-                    {warning}
-                  </Alert>
-                )}
+                {warning && <Alert severity="error" sx={{ mt: 2 }}>{warning}</Alert>}
+                <Button variant="contained" sx={{ mt: 2 }} onClick={startExercise}>
+                  Reset timer
+                </Button>
               </>
             )}
+
+            {exerciseCompleted && (
+              <>
+                <Alert severity="success" sx={{ mt: 2 }}>
+                  Exercise Completed Successfully!
+                </Alert>
+                <Button variant="contained" sx={{ mt: 2 }} onClick={startExercise}>
+                  Retake Exercise
+                </Button>
+              </>
+            )}
+            
           </Box>
         )}
 
-        {/* Webcam Feed */}
         <WebcamFeed />
       </Container>
     </Box>

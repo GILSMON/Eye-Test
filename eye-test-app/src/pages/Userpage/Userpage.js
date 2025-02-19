@@ -29,6 +29,7 @@ const UserPage = () => {
   const [exerciseCompleted, setExerciseCompleted] = useState(false);
   const [warning, setWarning] = useState("");
   const navigate = useNavigate();
+  const blinkcount = response.split("Blinks:")[1];
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -52,7 +53,6 @@ const UserPage = () => {
     const handleResponseUpdate = (newResponse) => {
       console.log("Response value:", newResponse);
       setResponse(newResponse);
-
       if (isExerciseActive) {
         if (newResponse === "Hand cover both eyes") {
           setWarning("");
@@ -111,33 +111,14 @@ const UserPage = () => {
           <Button variant="contained" onClick={() => navigate("/eyetest")} sx={{ mt: 3 }}>
             Take an Eye Test
           </Button>
-          <Button variant="contained" color="secondary" onClick={() => 
-          
-          navigate("/")} 
-            
-            sx={{ mt: 3 }}>
+          <Button variant="contained" color="secondary" onClick={() => navigate("/")} sx={{ mt: 3 }}>
             Logout
           </Button>
-           {/* Response Text Box */}
-           <Box
-            sx={{
-              position: "absolute",
-              top: 80,
-              right: 20,
-              width: 200,
-            }}
-          >
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="Response"
-              value={response}
-              InputProps={{ readOnly: true }}
-            />
+          <Box sx={{ position: "absolute", top: 80, right: 20, width: 200 }}>
+            <TextField fullWidth variant="outlined" label="Response" value={response} InputProps={{ readOnly: true }} />
           </Box>
         </Toolbar>
       </AppBar>
-      
 
       <Box sx={{ width: "100%", mt: 2 }}>
         <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)} centered>
@@ -164,8 +145,16 @@ const UserPage = () => {
               Blinking Instructions
             </Typography>
             <Typography variant="body1">
-              Blink rapidly for 10-15 seconds, then close your eyes and relax for 10 seconds. Repeat this process 5-10 times.
+            Blink your eyes 20 times to refresh and relax them.
             </Typography>
+            <TextField
+  fullWidth
+  variant="outlined"
+  label="Blink Count"
+  value={`Blink Count = ${response.split("Blinks: ")[1] || 0}`}
+  InputProps={{ readOnly: true }}
+  sx={{ marginTop: 2 }}
+/>
           </Paper>
         )}
 
@@ -174,13 +163,11 @@ const UserPage = () => {
             <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
               Palming Exercise
             </Typography>
-
             {!isExerciseActive && !exerciseCompleted && (
               <Button variant="contained" onClick={startExercise}>
                 Start Exercise
               </Button>
             )}
-
             {isExerciseActive && (
               <>
                 <Typography variant="body1" sx={{ mb: 2 }}>
@@ -196,21 +183,8 @@ const UserPage = () => {
                 </Button>
               </>
             )}
-
-            {exerciseCompleted && (
-              <>
-                <Alert severity="success" sx={{ mt: 2 }}>
-                  Exercise Completed Successfully!
-                </Alert>
-                <Button variant="contained" sx={{ mt: 2 }} onClick={startExercise}>
-                  Retake Exercise
-                </Button>
-              </>
-            )}
-            
           </Box>
         )}
-
         <WebcamFeed />
       </Container>
     </Box>
